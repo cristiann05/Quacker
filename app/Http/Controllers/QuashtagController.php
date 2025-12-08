@@ -48,7 +48,7 @@ class QuashtagController extends Controller
     public function edit(quashtags $quashtag)
     {
         return view('quashtags.edit', [
-            'quashtags' => $quashtag
+            'quashtag' => $quashtag
         ]);
     }
     /**
