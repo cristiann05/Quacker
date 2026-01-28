@@ -144,9 +144,11 @@
             <input type="text" name="nickname" placeholder="Nombre de usuario" required>
             <input type="email" name="email" placeholder="correo@ejemplo.com" required>
             <input type="password" name="password" placeholder="Contraseña" required>
+            <input type="password" name="password_confirmation" placeholder="Confirmar contraseña" required>
 
             <input type="submit" value="Registrarse">
         </form>
+
 
         <div class="divider">o</div>
 

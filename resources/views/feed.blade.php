@@ -258,6 +258,19 @@
 <body>
     <div class="container">
 
+        <form action="{{ route('users.destroy', auth()->user()->id) }}" method="POST"
+            onsubmit="return confirm('¿Seguro que quieres borrar tu cuenta? ESTA ACCIÓN ES IRREVERSIBLE');">
+            @csrf
+            @method('DELETE')
+
+            <button
+                style="margin-top:10px; width:100%; border:1px solid red; color:red; background:transparent; padding:6px; border-radius:999px;">
+                Borrar cuenta
+            </button>
+        </form>
+
+
+
         <!-- COLUMNA IZQUIERDA: PERFIL -->
         <div class="col" style="flex:0 0 250px;">
             <div class="profile-card">

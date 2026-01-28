@@ -4,9 +4,39 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
+    // Mostrar formulario de registro
+    public function create()
+    {
+        return view('users.create');
+    }
+
+    // Guardar nuevo usuario
+    public function store(Request $request)
+    {
+        $request->validate([
+            'full_name' => 'required|string|max:255',
+            'nickname' => 'required|string|max:255|unique:users,nickname',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|string|min:6|confirmed', // Confirmar con password_confirmation
+        ]);
+
+        User::create([
+            'full_name' => $request->full_name,
+            'nickname' => $request->nickname,
+            'email' => $request->email,
+            'password' => \Hash::make($request->password),
+        ]);
+
+        // Redirige al login después de registrarse
+        return redirect()->route('login')
+            ->with('success', 'Cuenta creada correctamente, inicia sesión.');
+    }
+
+
     // Método show para mostrar perfil de usuario
     public function show(User $user)
     {
@@ -46,4 +76,17 @@ class UserController extends Controller
 
         return view('users.search', compact('users', 'query'));
     }
+
+    public function destroy(User $user)
+    {
+        if (Auth::id() !== $user->id) {
+            abort(403, 'No tienes permiso para borrar esta cuenta.');
+        }
+
+        Auth::logout();
+        $user->delete();
+
+        return redirect('/login')->with('success', 'Cuenta eliminada correctamente.');
+    }
+
 }
