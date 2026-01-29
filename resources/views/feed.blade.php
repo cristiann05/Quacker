@@ -214,6 +214,15 @@
             color: #fff;
         }
 
+        .quav{
+            border: 1px solid #1da1f2;
+            color: #1da1f2;
+            background: transparent;
+            padding: 6px 12px;
+            border-radius: 999px;
+            cursor: pointer;
+            font-weight: bold;
+        }
         /* RESPONSIVE */
         @media(max-width:1024px) {
             .container {
@@ -312,7 +321,58 @@
                         <strong><a
                                 href="{{ route('users.show', $q->user->id) }}">{{ '@' . $q->user->nickname }}</a></strong>
                         <p>{{ $q->contenido }}</p>
+                        
+                        @if($q->quashtags->count())
+                            <div style="margin-top:6px;">
+                                @foreach($q->quashtags as $tag)
+                                    <a href="{{ route('quashtags.quacks', $tag->id) }}"
+                                    style="color:#1da1f2; margin-right:6px;">#{{ $tag->name }}</a>
+                                @endforeach
+                            </div>
+                        @endif
+
                         <small>{{ $q->created_at->format('d/m/Y H:i') }}</small>
+                        
+                        @if(auth()->id() === $q->user->id)
+                            <form action="{{ route('quacks.destroy', $q->id) }}" method="POST" style="margin-top:6px;">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit"
+                                        style="color:red; border:1px solid red; padding:4px 8px; border-radius:999px; background:transparent;">
+                                    Eliminar
+                                </button>
+                            </form>
+                        @endif
+
+                        @php
+                            $tieneLike = $q->quavers->contains(auth()->id());
+                        @endphp
+
+                        <form method="POST" action="{{ $tieneLike ? route('quacks.unquav', $q->id) : route('quacks.quav', $q->id) }}">
+                            @csrf
+                            <button type="submit" style="margin-top:6px;" class="quav">
+                                @if ($tieneLike !== true)
+                                    Quav
+                                @else
+                                    UnQuav
+                                @endif
+                            </button>
+                        </form>
+
+                        @php
+                            $tieneRequack = $q->requackers->contains(auth()->id());
+                        @endphp
+
+                        <form method="POST" action="{{ $tieneRequack ? route('quacks.unrequack', $q->id) : route('quacks.requack', $q->id) }}">
+                            @csrf
+                            <button type="submit" style="margin-top:6px;" class="quav">
+                                @if ($tieneRequack !== true)
+                                    Requav
+                                @else
+                                    UnRequav
+                                @endif
+                            </button>
+                        </form>
 
                         @if (auth()->id() !== $q->user->id)
                             <form method="POST"
