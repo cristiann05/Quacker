@@ -21,7 +21,7 @@ class feedController extends Controller
         $userIds = array_merge([$user->id], $follows);
 
         // Quacks de esos usuarios
-        $quacks = Quack::with('user')
+        $quacks = Quack::with(['user', 'quashtags','quavers' ,'requackers'])
             ->whereIn('user_id', $userIds)
             ->orderBy('created_at', 'desc')
             ->get();

@@ -214,6 +214,40 @@
             color: #fff;
         }
 
+        .quav{
+            border: 1px solid #1da1f2;
+            color: #1da1f2;
+            background: transparent;
+            padding: 6px 12px;
+            border-radius: 999px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .textarea-quack {
+            width: 100%;
+            padding: 14px;
+            background: #16181c;
+            border: 1px solid #2f3336;
+            border-radius: 16px;
+            color: #e7e9ea;
+            font-size: 16px;
+            line-height: 1.4;
+            resize: none;
+            outline: none;
+            transition: border-color .2s ease, background .2s ease;
+        }
+
+        .textarea-quack::placeholder {
+            color: #71767b;
+        }
+
+        .textarea-quack:focus {
+            border-color: #1da1f2;
+            background: #1a1c20;
+        }
+
+
         /* RESPONSIVE */
         @media(max-width:1024px) {
             .container {
@@ -258,6 +292,20 @@
 <body>
     <div class="container">
 
+<<<<<<< HEAD
+=======
+        <form action="{{ route('users.destroy', auth()->user()->id) }}" method="POST"
+            onsubmit="return confirm('¿Seguro que quieres borrar tu cuenta? ESTA ACCIÓN ES IRREVERSIBLE');">
+            @csrf
+            @method('DELETE')
+
+            <button
+                style="margin-top:10px; width:100%; border:1px solid red; color:red; background:transparent; padding:6px; border-radius:999px; cursor: pointer">
+                Borrar cuenta
+            </button>
+        </form>
+
+>>>>>>> 28372a169326170bab334364d13b5c109e8546b5
         <!-- COLUMNA IZQUIERDA: PERFIL -->
         <div class="col" style="flex:0 0 250px;">
             <div class="profile-card">
@@ -283,6 +331,16 @@
                         style="width:100%; border:none; background:transparent; color:#f4212e; cursor:pointer;">
                 </form>
             </div>
+
+            <form action="/feed" method="POST">
+                @csrf
+                <textarea class="textarea-quack" name="contenido" id="content" rows="3" placeholder="Que estas pensando?" required></textarea>
+                <button 
+                type="submit"
+                style="margin-top:10px; width:100%; border:1px solid lightblue; color:lightblue; background:transparent; padding:6px; border-radius:999px; cursor: pointer">
+                    Escribe lo que estas pensando...🦆
+                </button>
+            </form>
         </div>
 
         <!-- COLUMNA CENTRAL: FEED -->
@@ -299,7 +357,58 @@
                         <strong><a
                                 href="{{ route('users.show', $q->user->id) }}">{{ '@' . $q->user->nickname }}</a></strong>
                         <p>{{ $q->contenido }}</p>
+                        
+                        @if($q->quashtags->count())
+                            <div style="margin-top:6px;">
+                                @foreach($q->quashtags as $tag)
+                                    <a href="{{ route('quashtags.quacks', $tag->id) }}"
+                                    style="color:#1da1f2; margin-right:6px;">#{{ $tag->name }}</a>
+                                @endforeach
+                            </div>
+                        @endif
+
                         <small>{{ $q->created_at->format('d/m/Y H:i') }}</small>
+                        
+                        @if(auth()->id() === $q->user->id)
+                            <form action="{{ route('quacks.destroy', $q->id) }}" method="POST" style="margin-top:6px;">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit"
+                                        style="color:red; border:1px solid red; padding:4px 8px; border-radius:999px; background:transparent; cursor: pointer">
+                                    Eliminar
+                                </button>
+                            </form>
+                        @endif
+
+                        @php
+                            $tieneLike = $q->quavers->contains(auth()->id());
+                        @endphp
+
+                        <form method="POST" action="{{ $tieneLike ? route('quacks.unquav', $q->id) : route('quacks.quav', $q->id) }}">
+                            @csrf
+                            <button type="submit" style="margin-top:6px;" class="quav">
+                                @if ($tieneLike !== true)
+                                    Quav
+                                @else
+                                    UnQuav
+                                @endif
+                            </button>
+                        </form>
+
+                        @php
+                            $tieneRequack = $q->requackers->contains(auth()->id());
+                        @endphp
+
+                        <form method="POST" action="{{ $tieneRequack ? route('quacks.unrequack', $q->id) : route('quacks.requack', $q->id) }}">
+                            @csrf
+                            <button type="submit" style="margin-top:6px;" class="quav">
+                                @if ($tieneRequack !== true)
+                                    Requav
+                                @else
+                                    UnRequav
+                                @endif
+                            </button>
+                        </form>
 
                         @if (auth()->id() !== $q->user->id)
                             <form method="POST"

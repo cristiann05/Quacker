@@ -35,6 +35,29 @@ Route::get('/users/{user}/quacks', [UserQuacksController::class, 'index'])->name
 // Recursos públicos: Quacks y Quashtags
 Route::resource('quacks', QuackController::class)->only(['index', 'show']);
 Route::resource('quashtags', QuashtagController::class)->only(['index', 'show']);
+Route::delete('/quacks/{quack}', [QuackController::class, 'destroy'])
+    ->name('quacks.destroy')
+    ->middleware('auth');
+
+// QUAVEAR Y UNQUAVEAR?¿ HAHAH
+Route::post('/quacks/{quack}/quav', [QuackController::class, 'quav'])
+    ->name('quacks.quav')
+    ->middleware('auth');
+
+Route::post('/quacks/{quack}/unquav', [QuackController::class, 'unquav'])
+    ->name('quacks.unquav')
+    ->middleware('auth');
+// REQUACKS
+Route::post('/quacks/{quack}/requack', [QuackController::class, 'requack'])
+    ->name('quacks.requack')
+    ->middleware('auth');
+
+Route::post('/quacks/{quack}/unrequack', [QuackController::class, 'unrequack'])
+    ->name('quacks.unrequack')
+    ->middleware('auth');
+// QUASHTAGS
+Route::resource('quashtags', QuashtagController::class);
+Route::get('/quashtags/{quashtag}/quacks', [QuashtagController::class, 'quacks'])->name('quashtags.quacks');
 
 /*
 |--------------------------------------------------------------------------
@@ -45,6 +68,7 @@ Route::middleware('auth')->group(function () {
 
     // Feed principal
     Route::get('/feed', [feedController::class, 'index'])->name('feed');
+    Route::post('/feed', [QuackController::class, 'store']);
 
     // Logout
     Route::post('/logout', [SessionController::class, 'destroy'])->name('logout');
