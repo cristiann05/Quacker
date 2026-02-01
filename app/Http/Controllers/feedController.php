@@ -20,19 +20,27 @@ class feedController extends Controller
         $follows = $user->follows()->pluck('id')->toArray();
         $userIds = array_merge([$user->id], $follows);
 
-        // Quacks de esos usuarios
-        $quacks = Quack::with(['user', 'quashtags','quavers' ,'requackers'])
-            ->whereIn('user_id', $userIds)
+        // Traemos quacks de esos usuarios O quacks que yo he requackeado
+        $quacks = Quack::with(['user', 'quashtags', 'quavers', 'requackers'])
+            ->where(function ($query) use ($userIds) {
+                $query->whereIn('user_id', $userIds)
+                    ->orWhereHas('requackers', function ($q) {
+                        // Filtramos correctamente usando el pivot
+                        $q->where('user_id', auth()->id());
+                    });
+            })
             ->orderBy('created_at', 'desc')
             ->get();
 
-        // Usuarios que no sigo (para sugerencias / perfiles)
+        // Usuarios que no sigo (para sugerencias)
         $otherUsers = User::where('id', '!=', $user->id)
             ->whereNotIn('id', $follows)
             ->get();
 
         return view('feed', compact('quacks', 'otherUsers'));
     }
+
+
 
 
 

@@ -34,8 +34,8 @@ class QuackController extends Controller
     public function store(Request $request)
     {
 
-        //dd(auth(), auth()->user());   
-     
+        //dd(auth(), auth()->user());
+
         $request->validate([
             'contenido' => 'required|string'
         ]);
@@ -51,13 +51,13 @@ class QuackController extends Controller
 
         //Buscar o crear los quashtags
         $quashtags = [];
-        foreach ($quashtagNames as $name){
+        foreach ($quashtagNames as $name) {
             $quashtag = Quashtag::firstOrCreate(['name' => $name]);
             $quashtags[] = $quashtag->id;
         }
 
         //Asociar los quashtag al quack
-        if(!empty($quashtags)){
+        if (!empty($quashtags)) {
             $quack->quashtags()->sync($quashtags);
         }
 
@@ -131,19 +131,18 @@ class QuackController extends Controller
     {
         $user = auth()->user();
 
-        // Evitar requack duplicado
-        if (!$quack->requackers->contains($user->id)) {
+        // Evitar duplicados correctamente
+        if (!$quack->requackers()->where('user_id', $user->id)->exists()) {
             $quack->requackers()->attach($user->id);
         }
 
-        return redirect()->back();
+        return back();
     }
 
     public function unrequack(Quack $quack)
     {
-        $user = auth()->user();
-        $quack->requackers()->detach($user->id);
-
-        return redirect()->back();
+        $quack->requackers()->detach(auth()->id());
+        return back();
     }
+
 }

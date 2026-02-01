@@ -33,14 +33,17 @@ class User extends Authenticatable
         );
     }
 
-    // Quacks que ha requackeado
-    public function requacks()
+    // Quacks que el usuario ha requackeado
+    public function requackedQuacks()
     {
         return $this->belongsToMany(
             Quack::class,
-            'requacks'
-        );
+            'requacks',
+            'user_id',
+            'quack_id'
+        )->withTimestamps();
     }
+
 
     // Usuarios a los que sigue
     public function follows()
