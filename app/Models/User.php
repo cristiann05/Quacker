@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use App\Models\Quack;
-use App\Models\Quav;
 
 class User extends Authenticatable
 {
@@ -19,29 +18,72 @@ class User extends Authenticatable
         'bio'
     ];
 
+    // Quacks creados por el usuario
     public function quacks()
     {
         return $this->hasMany(Quack::class);
     }
 
+    // Quacks a los que ha dado like (quavs)
     public function quavs()
     {
-        return $this->hasMany(Quav::class);
+        return $this->belongsToMany(
+            Quack::class,
+            'quavs'
+        );
     }
 
+    // Quacks que el usuario ha requackeado
+    public function requackedQuacks()
+    {
+        return $this->belongsToMany(
+            Quack::class,
+            'requacks',
+            'user_id',
+            'quack_id'
+        )->withTimestamps();
+    }
+
+
+    // Usuarios a los que sigue
     public function follows()
     {
-        return $this->belongsToMany(User::class, "follows", "follower_id", "followed_id");
+        return $this->belongsToMany(
+            User::class,
+            'follows',
+            'follower_id',
+            'followed_id'
+        );
     }
 
+    // Usuarios que le siguen
     public function followers()
     {
-        return $this->belongsToMany(User::class, 'follows', 'followed_id', 'follower_id');
+        return $this->belongsToMany(
+            User::class,
+            'follows',
+            'followed_id',
+            'follower_id'
+        );
     }
 
-    public function requacks()
+    // Popularidad: total de quavers (likes) de todos sus quacks
+    public function getPopularidadAttribute()
     {
-        return $this->hasMany(Requack::class);
+        $total = 0;
+        foreach ($this->quacks as $quack) {
+            $total += $quack->quavers()->count();
+        }
+        return $total;
     }
 
+    // Viralidad: total de requacks de todos sus quacks
+    public function getViralidadAttribute()
+    {
+        $total = 0;
+        foreach ($this->quacks as $quack) {
+            $total += $quack->requackers()->count();
+        }
+        return $total;
+    }
 }
